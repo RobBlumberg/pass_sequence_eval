@@ -33,26 +33,32 @@ def get_events_for_game(game_json):
     xg_list = []
 
     for events in game_json:
-        if events['type']['name'] in ["Pass", "Ball Receipt", "Carry", "Shot"]:
+        if events['type']['name'] in ["Pass", "Ball Receipt*", "Carry", "Shot"]:
             name = events['type']['name'].lower()
             ids.append(events['id'])
             names.append(name)
             x_list.append(events['location'][0])
             y_list.append(events['location'][1])
-            
-            
-            if name != "shot":
-                x_end_list.append(events[name]["end_location"][0])
-                y_end_list.append(events[name]["end_location"][1])
-                xg_list.append(-1)
-            else:
+
+            if name == "shot":
                 x_end_list.append(-1)
                 y_end_list.append(-1)
                 xg_list.append(events[name]["statsbomb_xg"])
+
+            elif name == "ball receipt*":
+                x_end_list.append(-1)
+                y_end_list.append(-1)
+                xg_list.append(-1)
+            
+            else:
+                x_end_list.append(events[name]["end_location"][0])
+                y_end_list.append(events[name]["end_location"][1])
+                xg_list.append(-1)
+        
             if "related_events" in events.keys():
                 related.append(events["related_events"])
             else: 
-                related.append("None")
+                related.append([])
             
     
     events_df = pd.DataFrame({"ids": ids,
@@ -83,6 +89,11 @@ def plot_shot(events_df, eventid, axis):
     axis.scatter(events_df.loc[eventid]["x"],
                  events_df.loc[eventid]["y"],
                  marker="X", s=200)
+
+def plot_receipt(events_df, eventid, axis):
+    axis.scatter(events_df.loc[eventid]["x"],
+                 events_df.loc[eventid]["y"],
+                 marker="*", s=200)
     
 def plot_event(events_df, eventid, axis):
     """
@@ -111,3 +122,5 @@ def plot_event(events_df, eventid, axis):
         plot_carry(events_df, eventid, axis=axis)
     elif event_type == "shot":
         plot_shot(events_df, eventid, axis=axis)
+    elif event_type == "ball receipt*":
+        plot_receipt(events_df, eventid, axis=axis)
