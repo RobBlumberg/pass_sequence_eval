@@ -72,9 +72,9 @@ def get_sequences(my_graph):
     sequences = []
     for connected_comp in list(nx.connected_components(my_graph)):
         graph = my_graph.subgraph(connected_comp)
-        nodes = largest_distance(my_graph)
+        nodes = largest_distance(graph)
         if nodes[0] != 0:
-            path = nx.shortest_path(my_graph,
+            path = nx.shortest_path(graph,
                                     source=list(nodes[1])[0][0], 
                                     target=list(nodes[1])[0][1])
 
